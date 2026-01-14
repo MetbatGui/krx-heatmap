@@ -1,0 +1,12 @@
+[project]
+name = "krx-heatmap"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "finance-datareader>=0.9.101",
+    "openpyxl>=3.1.5",
+    "pandas>=2.3.3",
+    "plotly>=6.5.0",
+]
