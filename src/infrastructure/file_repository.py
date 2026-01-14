@@ -30,7 +30,8 @@ class ThemeFileRepository:
                         '종목명': stock.strip()
                     })
             
-            df_long = pd.DataFrame(long_data, columns=['테마', '종목명'])
+            df_long = pd.DataFrame(long_data)
+            df_long.columns = ['테마', '종목명']
             
             print(f"테마 데이터 로딩 및 변환 완료: {len(df_long)}개 항목 (Unique 종목 {df_long['종목명'].nunique()}개)")
             return df_long

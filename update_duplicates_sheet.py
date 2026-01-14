@@ -49,7 +49,8 @@ def update_duplicates_sheet():
         
         # Create new DataFrame
         new_columns = ['종목명'] + [f'테마{i+1}' for i in range(max_themes)]
-        df_new_duplicates = pd.DataFrame(duplicates_data, columns=new_columns)
+        df_new_duplicates = pd.DataFrame(duplicates_data)
+        df_new_duplicates.columns = new_columns
         
         # Update the dictionary
         sheet_dict['중복종목'] = df_new_duplicates

@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Add src to python path to import config
     sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
     try:
-        from theme_config import PRIORITY_THEMES, THEME_RENAME
+        from domain.theme_config import PRIORITY_THEMES, THEME_RENAME
     except ImportError:
         print("Warning: Could not import theme_config. Using defaults.")
         PRIORITY_THEMES = []
