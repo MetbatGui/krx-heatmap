@@ -1,13 +1,75 @@
 import plotly.graph_objects as go
 import pandas as pd
 import os
-from domain.theme_config import THEME_HIERARCHY
+from presentation.view_models import HeatmapViewModel
 
 class HeatmapVisualizer:
-    """히트맵 시각화 클래스"""
+    """히트맵 시각화 클래스
+    
+    Presentation 레이어로서 순수하게 시각화만 담당합니다.
+    비즈니스 로직은 포함하지 않으며, ViewModel을 받아 Plotly 차트를 생성합니다.
+    """
+    
+    def create_treemap_from_viewmodel(
+        self, 
+        view_model: HeatmapViewModel, 
+        output_file: str = 'theme_heatmap.html'
+    ):
+        """ViewModel을 기반으로 Plotly Treemap을 생성하고 저장합니다.
+        
+        Args:
+            view_model: HeatmapViewModel
+            output_file: 출력 파일명
+        """
+        custom_colorscale = [
+            [0.0, 'blue'],
+            [0.5, '#444444'],
+            [1.0, 'red']
+        ]
+        
+        fig = go.Figure(go.Treemap(
+            ids=view_model.get_ids(),
+            labels=view_model.get_labels(),
+            parents=view_model.get_parents(),
+            values=view_model.get_values(),
+            branchvalues='total',
+            maxdepth=2,
+            marker=dict(
+                colors=view_model.get_colors(),
+                colorscale=custom_colorscale,
+                cmid=0,
+                cmin=-5,
+                cmax=5,
+                colorbar=dict(title="등락률(%)")
+            ),
+            customdata=view_model.get_custom_data(),
+            texttemplate=view_model.get_text_templates(),
+            hovertemplate='<b>%{label}</b><br>시가총액: %{value:.2f}조 원<br>등락률: %{customdata:.2f}%<extra></extra>',
+            textposition='middle center'
+        ))
+        
+        fig.update_layout(
+            title=view_model.title,
+            margin=dict(t=50, l=10, r=10, b=10),
+            font=dict(family="Malgun Gothic", size=15)
+        )
+        
+        fig.write_html(output_file)
+        print(f"\n히트맵 생성 완료: {output_file}")
+        
+        # 브라우저 자동 실행
+        try:
+            os.startfile(output_file)
+        except AttributeError:
+            import webbrowser
+            webbrowser.open(output_file)
     
     def create_treemap(self, df_final: pd.DataFrame, group_stats: dict, output_file: str = 'theme_heatmap.html'):
-        """데이터프레임을 기반으로 Plotly Treemap을 생성하고 저장합니다."""
+        """데이터프레임을 기반으로 Plotly Treemap을 생성하고 저장합니다. (기존 API - 하위 호환)
+        
+        DEPRECATED: 하위 호환을 위해 유지하지만, create_treemap_from_viewmodel 사용을 권장합니다.
+        """
+        from domain.theme_config import THEME_HIERARCHY
         
         ids = []
         labels = []

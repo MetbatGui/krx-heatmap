@@ -5,26 +5,32 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 from application.heatmap_service import HeatmapService
+from application.view_model_builder import HeatmapViewModelBuilder
 from presentation.visualizer import HeatmapVisualizer
 
 def main():
     try:
         # 1. 서비스 초기화 및 데이터 로드
         service = HeatmapService()
-        df_final = service.get_heatmap_data()
         
-        if df_final.empty:
+        # Domain Model 사용 (새로운 방식)
+        themes = service.get_themes()
+        
+        if not themes:
             print("히트맵 데이터를 가져오지 못했습니다.")
             return
             
-        print(f"히트맵 생성 대상 종목 수: {len(df_final)}")
+        print(f"히트맵 생성 대상 종목 수: {sum(theme.stock_count for theme in themes)}")
         
-        # 2. 그룹 통계 계산 (중간 노드용)
-        group_stats = service.calculate_group_stats(df_final)
+        # 2. 그룹 통계 계산
+        group_stats = service.get_group_stats_models(themes)
         
-        # 3. 시각화 생성
+        # 3. ViewModel 생성
+        view_model = HeatmapViewModelBuilder.build(themes, group_stats)
+        
+        # 4. 시각화 생성
         visualizer = HeatmapVisualizer()
-        visualizer.create_treemap(df_final, group_stats)
+        visualizer.create_treemap_from_viewmodel(view_model)
         
     except Exception as e:
         print(f"오류 발생: {e}")
